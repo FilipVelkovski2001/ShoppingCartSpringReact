@@ -1,6 +1,7 @@
 package com.abysalto.mid.controller;
 
 import com.abysalto.mid.dto.request.AddItem;
+import com.abysalto.mid.dto.request.UpdateQuantity;
 import com.abysalto.mid.dto.response.ApiResponse;
 import com.abysalto.mid.dto.response.CartDto;
 import com.abysalto.mid.service.CartService;
@@ -37,9 +38,10 @@ public class CartController {
     @PatchMapping("/items/{productId}")
     public ResponseEntity<ApiResponse<CartDto>> updateQuantity(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable Integer productId, @RequestParam Integer quantity) {
+            @PathVariable Integer productId,
+            @Valid @RequestBody UpdateQuantity request) {
         CartDto cart = cartService.updateItemQuantity(userDetails.getUsername(),
-                productId, quantity);
+                productId, request);
         return ResponseEntity.ok(ApiResponse.success("Cart updated", cart));
     }
 

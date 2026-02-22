@@ -1,6 +1,7 @@
 package com.abysalto.mid.service.impl;
 
 import com.abysalto.mid.dto.request.AddItem;
+import com.abysalto.mid.dto.request.UpdateQuantity;
 import com.abysalto.mid.dto.response.CartDto;
 import com.abysalto.mid.dto.response.CartItemDto;
 import com.abysalto.mid.entity.Cart;
@@ -67,18 +68,19 @@ public class CartServiceImpl implements CartService {
     @Override
     @Transactional
     public CartDto updateItemQuantity(String username, Integer productId,
-            Integer quantity) {
+            UpdateQuantity request) {
         User user = getUser(username);
-        Cart cart = cartRepository.findByUser(user).orElseThrow(
-                () -> new ResourceNotFoundException("Cart not found"));
+        Cart cart = cartRepository.findByUser(user)
+                                  .orElseThrow(() -> new ResourceNotFoundException("Cart not found"));
 
-        if (quantity <= 0) {
+        if (request.getQuantity() <= 0) {
             return removeItem(username, productId);
         }
 
         cart.getItems().stream()
-            .filter(item -> item.getProductId().equals(productId)).findFirst()
-            .ifPresent(item -> item.setQuantity(quantity));
+            .filter(i -> i.getProductId().equals(productId))
+            .findFirst()
+            .ifPresent(i -> i.setQuantity(request.getQuantity()));
 
         cartRepository.save(cart);
         return mapToDto(cart);
